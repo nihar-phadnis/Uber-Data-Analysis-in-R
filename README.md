@@ -15,11 +15,11 @@ Next, we look at the trips by hours of every month.
 
 ![Trip_Hour Month](https://user-images.githubusercontent.com/87315724/168675782-ef5d044b-0c6b-4702-b18b-c2af5c5bc264.jpeg)
 
-We look at the number of trips that were made on every day of the week. We notice an increasing trend of the trips over these months. 
+We look at the number of trips that were made on the very day of the week, every month. We notice an increasing trend of the trips over these months. 
 
 ![Day_Month](https://user-images.githubusercontent.com/87315724/168676176-54e6a403-43ab-4c0d-8076-5d42a35d8998.jpeg)
 
-And for all the trips over every month. September by far seen the highest number of trips. 
+And now for all the trips over every month. September by far seen the highest number of trips. 
 
 ![Trips_by_months](https://user-images.githubusercontent.com/87315724/168676786-02ef0c73-82e5-431c-b78b-b0d71907c403.jpeg)
 
