@@ -1,0 +1,133 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+Data Analysis through visualisation in R
+
+First, importing the necessary libraries in R. 
+
+ggplot: Creating aesthetic visualisation plots
+lubridate: Dealing with time-frames in the dataset
+dplyr: Data Manipulation
+tidyr: Tidy Messy Data 
+DT: Datatables in JavaScript
+scales: Map data to correct scales with axes and legends.
+```{r}
+library(ggplot2)
+library(ggthemes)
+library(lubridate)
+library(dplyr)
+library(tidyr)
+library(DT)
+library(scales)
+```
+
+Reading the data from the csv files and then combining together
+```{r}
+
+april <- read.csv('uber-raw-data-apr14.csv')
+may <- read.csv('uber-raw-data-may14.csv')
+june <- read.csv('uber-raw-data-jun14.csv')
+july <- read.csv('uber-raw-data-jul14.csv')
+aug <- read.csv('uber-raw-data-aug14.csv')
+sept <- read.csv('uber-raw-data-sep14.csv')
+data <- rbind(april, may, june, july, aug, sept)
+
+```
+
+Here, we will convert the Date.Time into a more readable format using Date time conversion
+```{r}
+
+data$Date.Time <- as.POSIXct(data$Date.Time, format= "%m/%d/%Y %H:%M:%S")
+data$Time <- format(as.POSIXct(data$Date.Time, format = "%m/%d/%Y %H:%M:%S"), format="%H:%M:%S")
+data$Date.Time <- ymd_hms(data$Date.Time)
+```
+
+```{r}
+data$day <- factor(day(data$Date.Time))
+data$month <- factor(month(data$Date.Time, label=TRUE))
+data$year <- factor(year(data$Date.Time))
+data$dayofweek <- factor(wday(data$Date.Time, label=TRUE))
+
+data$hour <- factor(hour(hms(data$Time)))
+data$minute <- factor(minute(hms(data$Time)))
+data$second <- factor(second(hms(data$Time)))
+```
+Data Visualisation Part
+
+Trips by hours in a day
+
+```{r}
+hourly_data <- data %>% group_by(hour) %>% dplyr::summarize(Total=n())
+
+datatable(hourly_data)
+
+ggplot(hourly_data, aes(hour, Total)) +
+        geom_bar( stat = "identity", fill = "steelblue", color = "red") +
+           ggtitle("Trips Every Hour") +
+            theme(legend.position = "none") +
+            scale_y_continuous(labels = comma)
+```
+
+Plotting Trips by hour and month
+```{r}
+month_hour <- data %>%
+          group_by(month, hour) %>%
+             dplyr::summarize(Total = n())
+
+ggplot(month_hour, aes(hour, Total, fill = month)) + 
+       geom_bar( stat = "identity") +
+          ggtitle("Trips by Hour and Month") +
+           scale_y_continuous(labels = comma)
+
+```
+Plotting trips by day of the month
+
+```{r}
+trips_by_day <- data %>% group_by(day) %>% dplyr::summarize(Trips=n())
+
+ggplot(trips_by_day, aes(x= day, y= Trips))+ 
+geom_bar(stat = "identity", fill = "steelblue") +
+ggtitle("Trips by day of the month") + 
+theme(legend.position = "none") + 
+scale_y_continuous(labels = comma)
+
+```
+Now, plotting trips by day and month
+```{r}
+
+trips_month_days <- data %>% group_by(dayofweek, month) %>% dplyr::summarize(Trips=n())
+
+ggplot(trips_month_days, aes(dayofweek, Trips, fill = month)) + 
+geom_bar(stat = "identity", aes(fill = month), position = "dodge") + 
+ggtitle("Trips by Day and Month") + 
+scale_y_continuous(labels = comma) +
+scale_fill_manual(values = c("red", "yellow", "black", "green", "grey", "brown"))
+
+```
+Trips by months
+
+```{r}
+monthly_data <-  data %>% group_by(month) %>% dplyr::summarize(Trips=n())
+
+ggplot(monthly_data, aes(month, Trips, fill= month)) +
+geom_bar(stat = "identity", aes(fill=month), position="dodge") +
+ggtitle("Trips by months") +
+scale_y_continuous(labels = comma) +
+scale_fill_manual(values = c("red", "yellow", "black", "green", "grey", "brown"))
+```
+Heatmap Visualisation by hour and day.
+
+```{r}
+day_hour_data <- data %>% group_by(day, hour) %>% dplyr::summarize(Total = n())
+datatable(day_hour_data)
+
+ggplot(day_hour_data, aes(day, hour, fill = Total)) + 
+geom_tile(color = "white") + 
+ggtitle("Heat Map by Hour and Day")
+```
+
+
+
